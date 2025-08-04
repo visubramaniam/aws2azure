@@ -1,11 +1,11 @@
 # User will use Ansible Vault to encrypt this file.
 # Ansible will decrypt this file when it executes the playbook.
 
-aws_cloud_storage_serial: 237167
-aws_cloud_storage_address: 172.19.1.211
+aws_cloud_storage_serial: 228743
+aws_cloud_storage_address: 172.17.1.28
 aws_cloud_vault_storage_username: ansible
 aws_cloud_vault_storage_secret: Hitachi123
-az_cloud_storage_serial: 264970
-az_cloud_storage_address: 172.18.1.9
+az_cloud_storage_serial: 252879
+az_cloud_storage_address: 172.18.1.27
 az_cloud_vault_storage_username: ansible
 az_cloud_vault_storage_secret: Hitachi123
