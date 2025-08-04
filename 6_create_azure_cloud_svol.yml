@@ -1,0 +1,103 @@
+####################################################################
+# Create a volume in the cloud storage and attach it to a compute node.
+####################################################################
+- name: Volume Module
+  hosts: localhost
+  gather_facts: false
+  no_log: false
+  # Removed 'collections' as FQCN will be used for all modules
+  vars_files:
+    - ansible_vault_storage_var.yml
+
+  vars:
+    # Common connection info for all tasks
+    connection_info:
+      address: "{{ az_cloud_storage_address }}"
+      username: "{{ az_cloud_vault_storage_username }}"
+      password: "{{ az_cloud_vault_storage_secret}}"
+  tasks:
+    ####################################################################
+    # Task 1 : Create volume
+    ####################################################################
+    - name: Create and attach volume
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          volume_create \
+          --base_name_for_name "{{ az_cloud_vol_name }}" \
+          --storage_controller_id "{{ az_storage_controller_id }}" \
+          --capacity 102400 \
+          --pool_id_name "{{ az_cloud_pool_name }}" | \
+          grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: job_id
+
+    - name: Echo job_id
+      ansible.builtin.debug:
+        msg: "{{ job_id.stdout }}"
+
+    - name: Set job_id_out fact
+      ansible.builtin.set_fact:
+        job_id_out: "{{ job_id.stdout.strip() }}"
+
+    - name: Get Volume ID
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          job_list \
+          --ids "{{ job_id_out }}" |\
+          grep "Value" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: volume_id
+      until: volume_id.rc == 0
+      retries: 10
+      delay: 30
+    - name: Echo volume_id
+      ansible.builtin.debug:
+        msg: "{{ volume_id.stdout.strip() }}"
+
+    - name: Set az_volume_id_out fact in stats
+      ansible.builtin.set_fact:
+        volume_id: "{{ volume_id.stdout.strip() }}"
+
+    - name: Get Volume Unique ID
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          volume_show \
+          --id_name "{{ az_cloud_vol_name }}" |\
+          grep "^Volume Number" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: volume_uniq_id
+      until: volume_uniq_id.rc == 0
+      retries: 10
+      delay: 30
+
+    - name: Echo volume_uniq_id
+      ansible.builtin.debug:
+        msg: "{{ volume_uniq_id.stdout.strip() }}"
+
+    - name: Set az_volume_uniq_id_out fact in stats
+      ansible.builtin.set_stats:
+        data:
+          az_svol_ldev_id: "{{ volume_uniq_id.stdout.strip() }}"
+
+    - name: Attach volume
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          volume_server_connection_create \
+          --volume_id "{{ volume_id }}" \
+          --server_id "e566f269-5ec9-4937-89f0-0c20cf88ad3b" |\
+          grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: job_id
+

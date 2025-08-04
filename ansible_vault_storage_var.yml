@@ -1,0 +1,15 @@
+# User will use Ansible Vault to encrypt this file.
+# Ansible will decrypt this file when it executes the playbook.
+storage_serial: 810396
+storage_address: 192.168.180.12
+storage_controller_ip: 192.168.180.13
+vault_storage_username: ansible
+vault_storage_secret: Remote01
+gcp_cloud_storage_serial: 237167
+gcp_cloud_storage_address: 172.19.1.211
+gcp_cloud_vault_storage_username: ansible
+gcp_cloud_vault_storage_secret: Hitachi123
+az_cloud_storage_serial: 264970
+az_cloud_storage_address: 172.18.1.9
+az_cloud_vault_storage_username: ansible
+az_cloud_vault_storage_secret: Hitachi123

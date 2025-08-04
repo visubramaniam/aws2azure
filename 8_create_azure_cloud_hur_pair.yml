@@ -1,0 +1,162 @@
+---
+####################################################################
+# Create Cloud HUR PAIR
+####################################################################
+- name: Create Cloud HUR Journal
+  hosts: localhost
+  vars_files:
+    - ansible_vault_storage_var.yml
+  tasks:
+    - name: Get HORCM UDP Port for Cloud Command Device
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          storage_controller_show \
+          --id "{{ az_storage_controller_id }}" |\
+          grep "^Udp" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: udp_port_out
+      failed_when: udp_port_out.rc != 0
+
+    - ansible.builtin.set_fact:
+        az_udp_port: "{{ udp_port_out.stdout.strip() }}"
+
+    - name: Get Path Group ID for HORCM config file
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          remotepath_group_list \
+          --local_storage_controller_id "{{ az_storage_controller_id }}" |\
+          grep "^Path" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: path_grp_id_out
+      failed_when: path_grp_id_out.rc != 0
+
+    - name: Set Azure Path Group ID fact
+      ansible.builtin.set_fact:
+        az_path_grp_id: "{{ path_grp_id_out.stdout.strip() }}"
+
+    - name: Get Active Storage Node ID
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          storage_controller_show \
+          --id "{{ az_storage_controller_id }}" |\
+          grep "^Active" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: active_node_id_out
+      failed_when: active_node_id_out.rc != 0
+
+    - ansible.builtin.set_fact:
+        az_active_node_id: "{{ active_node_id_out.stdout.strip() }}"
+
+    - name: Get Active Storage Node ID Control IP
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ az_cloud_storage_address }}" \
+          --user "{{ az_cloud_vault_storage_username }}" \
+          --password "{{ az_cloud_vault_storage_secret }}" \
+          storage_node_show \
+          --id "{{ az_active_node_id }}" |\
+          grep "^Control" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: active_node_ip_out
+      failed_when: active_node_ip_out.rc != 0
+
+    - ansible.builtin.set_fact:
+        az_active_node_ip: "{{ active_node_ip_out.stdout.strip() }}"
+
+    - name: Check if horcm110 file exists
+      ansible.builtin.stat:
+        path: /tmp/horcm110.conf.j2
+      register: horcm110_file
+
+    - name: Check if horcm111 file exists
+      ansible.builtin.stat:
+        path: /tmp/horcm111.conf.j2
+      register: horcm111_file
+
+    - name: Modify horcm110.conf.tmpl
+      ansible.builtin.template:
+        src: /tmp/horcm110.conf.j2
+        dest: /HORCM/etc/horcm110.conf
+        mode: '0777'
+
+    - name: Modify horcm111.conf.tmpl
+      ansible.builtin.template:
+        src: /tmp/horcm111.conf.j2
+        dest: /HORCM/etc/horcm111.conf
+        mode: '0777'
+
+    - name: Display horcm110.conf contents
+      ansible.builtin.shell: cat /HORCM/etc/horcm110.conf
+      register: horcm110_output
+
+    - name: Print to console
+      ansible.builtin.debug:
+        msg: "{{ horcm110_output.stdout_lines }}"
+
+    - name: Display horcm111.conf contents
+      ansible.builtin.shell: cat /HORCM/etc/horcm111.conf
+      register: horcm111_output
+
+    - name: Print to console
+      ansible.builtin.debug:
+        msg: "{{ horcm111_output.stdout_lines }}"
+
+    - name: Start horcm110
+      ansible.builtin.shell: |
+        HORCMINST=110 HORCM_CONF=/HORCM/etc/horcm110.conf /HORCM/usr/bin/horcmstart.sh
+      register: ret
+      failed_when: >
+        ("Failed" in ret.stdout) or
+        (ret.stderr != '') or
+        (ret.rc != 0)
+      when: horcm110_file.stat.exists
+      until: ret.rc == 0
+      retries: 10
+      delay: 30
+
+    - name: Start horcm111
+      ansible.builtin.shell: |
+        HORCMINST=111 HORCM_CONF=/HORCM/etc/horcm111.conf /HORCM/usr/bin/horcmstart.sh
+      register: ret
+      failed_when: >
+        (ret.stderr != '') or
+        (ret.rc != 0)
+      when: horcm111_file.stat.exists
+      until: ret.rc == 0
+      retries: 10
+      delay: 30
+
+    - name: Login to the storage system
+      ansible.builtin.shell: |
+        /HORCM/usr/bin/raidcom -login "{{ vault_storage_username }}" "{{ vault_storage_secret }}" -I110
+
+
+    - name: Create cloud HUR PAIR
+      ansible.builtin.shell: "/HORCM/usr/bin/paircreate -g TCDEMO -f async {{ az_ctg_id }} -jp {{ onprem_journal_id }} -js {{ az_cloud_journal_number }} -vl -I110"
+      register: ret
+      failed_when: >
+        (ret.stderr != '') or
+        (ret.rc != 0)
+
+    - name: Wait for the pair creation to complete 
+      ansible.builtin.shell: "/HORCM/usr/bin/pairevtwait -g TCDEMO -s pair -t 3600 -I110"
+      register: ret
+      failed_when: >
+        (ret.stderr != '') or
+        (ret.rc != 0)
+
+    - name: Wait for the pair creation to complete HUR PAIR 
+      ansible.builtin.shell: "/HORCM/usr/bin/pairsplit -g TCDEMO -S -I110"
+      register: ret
+      failed_when: >
+        (ret.stderr != '') or
+        (ret.rc != 0)
