@@ -7,7 +7,20 @@
   vars_files:
     - ansible_vault_storage_var.yml
   tasks:
-    - name: Get HORCM UDP Port for Cloud Command Device
+    - name: Get HORCM UDP Port for Cloud AWS Command Device
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ aws_cloud_storage_address }}" \
+          --user "{{ aws_cloud_vault_storage_username }}" \
+          --password "{{ aws_cloud_vault_storage_secret }}" \
+          storage_controller_show \
+          --id "{{ aws_storage_controller_id }}" |\
+          grep "^Udp" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: udp_port_out_aws
+      failed_when: udp_port_out_aws.rc != 0
+
+    - name: Get HORCM UDP Port for Cloud Azure Command Device
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
@@ -17,12 +30,13 @@
           storage_controller_show \
           --id "{{ az_storage_controller_id }}" |\
           grep "^Udp" | tr -d " " | cut -d":" -f2 | tr -d "\n"
-      register: udp_port_out
-      failed_when: udp_port_out.rc != 0
+      register: udp_port_out_az
+      failed_when: udp_port_out_az.rc != 0
 
     - ansible.builtin.set_fact:
-        az_udp_port: "{{ udp_port_out.stdout.strip() }}"
-
+        az_udp_port: "{{ udp_port_out_az.stdout.strip() }}"
+        aws_udp_port: "{{ udp_port_out_aws.stdout.strip() }}"
+        
     - name: Get Path Group ID for HORCM config file
       ansible.builtin.shell: |
         set -o pipefail

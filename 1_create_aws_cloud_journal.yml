@@ -9,9 +9,9 @@
   vars:
     # Common connection info for all tasks
     connection_info:
-      address: "{{ gcp_cloud_storage_address }}"
-      username: "{{ gcp_cloud_vault_storage_username }}"
-      password: "{{ gcp_cloud_vault_storage_secret}}"
+      address: "{{ aws_cloud_storage_address }}"
+      username: "{{ aws_cloud_vault_storage_username }}"
+      password: "{{ aws_cloud_vault_storage_secret}}"
 
   tasks:
     - name: Get Volume Facts
@@ -37,14 +37,14 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ gcp_cloud_storage_address }}" \
-          --user "{{ gcp_cloud_vault_storage_username }}" \
-          --password "{{ gcp_cloud_vault_storage_secret }}" \
+          --host "{{ aws_cloud_storage_address }}" \
+          --user "{{ aws_cloud_vault_storage_username }}" \
+          --password "{{ aws_cloud_vault_storage_secret }}" \
           volume_create \
-          --base_name_for_name "{{ gcp_cloud_journal_name }}" \
+          --base_name_for_name "{{ aws_cloud_journal_name }}" \
           --storage_controller_id "{{ result.ansible_facts.volumes[0].storage_controller_id }}" \
           --capacity 102400 \
-          --pool_id_name "{{ gcp_cloud_pool_name }}" | \
+          --pool_id_name "{{ aws_cloud_pool_name }}" | \
           grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       when: not journal_volume_file.stat.exists
       register: job_id
@@ -62,9 +62,9 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ gcp_cloud_storage_address }}" \
-          --user "{{ gcp_cloud_vault_storage_username }}" \
-          --password "{{ gcp_cloud_vault_storage_secret }}" \
+          --host "{{ aws_cloud_storage_address }}" \
+          --user "{{ aws_cloud_vault_storage_username }}" \
+          --password "{{ aws_cloud_vault_storage_secret }}" \
           job_list \
           --ids "{{ job_id_out }}" |\
           grep "Value" | tr -d " " | cut -d":" -f2 | tr -d "\n"
@@ -88,12 +88,12 @@
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ gcp_cloud_storage_address }}" \
-          --user "{{ gcp_cloud_vault_storage_username }}" \
-          --password "{{ gcp_cloud_vault_storage_secret }}" \
+          --host "{{ aws_cloud_storage_address }}" \
+          --user "{{ aws_cloud_vault_storage_username }}" \
+          --password "{{ aws_cloud_vault_storage_secret }}" \
           journal_create \
           --volume_ids "{{ volume_id_out }}" \
-          --journal_number "{{ gcp_cloud_journal_number }}"
+          --journal_number "{{ aws_cloud_journal_number }}"
       when: not journal_created.stat.exists
       register: command_output
       args:
