@@ -1,11 +1,24 @@
 # User will use Ansible Vault to encrypt this file.
 # Ansible will decrypt this file when it executes the playbook.
-
 aws_cloud_storage_serial: 228743
 aws_cloud_storage_address: 172.17.1.28
 aws_cloud_vault_storage_username: ansible
 aws_cloud_vault_storage_secret: Hitachi123
+aws_cloud_vol_name: mySQL_HUR_ansibl
+aws_cloud_pool_name: StoragePool01
+aws_cloud_journal_number: 8
+aws_cloud_journal_name: mySQL_HUR_ansibl_JNL
+aws_ctg_id: 8
+
 az_cloud_storage_serial: 252879
 az_cloud_storage_address: 172.18.1.27
 az_cloud_vault_storage_username: ansible
 az_cloud_vault_storage_secret: Hitachi123
+az_cloud_vol_name: mySQL_HUR_ansibl
+az_cloud_vol_capacity: 100GB
+az_cloud_pool_name: StoragePool01
+az_cloud_compute_node_name: mysql-hur
+az_cloud_journal_number: 8
+az_cloud_journal_name: mySQL_HUR_ansibl_JNL
+az_storage_controller_id: 82062489-e100-4ad3-b3ae-3bc016bda374
+az_ctg_id: 8
