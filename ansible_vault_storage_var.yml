@@ -20,5 +20,5 @@ az_cloud_pool_name: StoragePool01
 az_cloud_compute_node_name: SLES-Jump
 az_cloud_journal_number: 100
 az_cloud_journal_name: aws2azure_jnl
-az_storage_controller_id: 82062489-e100-4ad3-b3ae-3bc016bda374
+az_storage_controller_id: ac60400d-ea6b-4f76-a455-4be522b7043f
 az_ctg_id: 100
