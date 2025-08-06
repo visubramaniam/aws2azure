@@ -6,9 +6,9 @@ aws_cloud_vault_storage_username: ansible
 aws_cloud_vault_storage_secret: Hitachi123
 aws_cloud_vol_name: AWS2Azure
 aws_cloud_pool_name: StoragePool01
-aws_cloud_journal_number: 8
+aws_cloud_journal_number: 100
 aws_cloud_journal_name: aws2azure_jnl
-aws_ctg_id: 8
+aws_ctg_id: 100
 
 az_cloud_storage_serial: 252879
 az_cloud_storage_address: 172.18.1.27
@@ -18,7 +18,7 @@ az_cloud_vol_name: AWS2Azure
 az_cloud_vol_capacity: 1GB
 az_cloud_pool_name: StoragePool01
 az_cloud_compute_node_name: SLES-Jump
-az_cloud_journal_number: 8
+az_cloud_journal_number: 100
 az_cloud_journal_name: aws2azure_jnl
 az_storage_controller_id: 82062489-e100-4ad3-b3ae-3bc016bda374
-az_ctg_id: 8
+az_ctg_id: 100
