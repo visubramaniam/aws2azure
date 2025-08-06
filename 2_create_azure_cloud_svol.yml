@@ -86,7 +86,7 @@
     - name: Set az_volume_uniq_id_out fact in stats
       ansible.builtin.set_stats:
         data:
-          az_svol_ldev_id: "{{ volume_uniq_id.stdout.strip() }}"
+          svol_ldev_id: "{{ volume_uniq_id.stdout.strip() }}"
 
     - name: Attach volume
       ansible.builtin.shell: |
