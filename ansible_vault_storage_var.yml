@@ -15,7 +15,7 @@ az_cloud_storage_address: 172.18.1.27
 az_cloud_vault_storage_username: ansible
 az_cloud_vault_storage_secret: Hitachi123
 az_cloud_vol_name: AWS2Azure
-az_cloud_vol_capacity: 1GB
+az_cloud_vol_capacity: 1024
 az_cloud_pool_name: StoragePool01
 az_cloud_compute_node_name: SLES-Jump
 az_cloud_journal_number: 100

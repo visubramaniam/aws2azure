@@ -29,7 +29,7 @@
           volume_create \
           --base_name_for_name "{{ az_cloud_vol_name }}" \
           --storage_controller_id "{{ az_storage_controller_id }}" \
-          --capacity 102400 \
+          --capacity "{{ az_cloud_vol_capacity }}" \
           --pool_id_name "{{ az_cloud_pool_name }}" | \
           grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: job_id
@@ -97,7 +97,7 @@
           --password "{{ az_cloud_vault_storage_secret }}" \
           volume_server_connection_create \
           --volume_id "{{ volume_id }}" \
-          --server_id "e566f269-5ec9-4937-89f0-0c20cf88ad3b" |\
+          --server_id "e2ab5949-a1c0-4afe-aa26-04804172c86b" |\
           grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: job_id
 
