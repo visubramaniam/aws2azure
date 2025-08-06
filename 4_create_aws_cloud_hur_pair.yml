@@ -184,11 +184,11 @@
 
     - name: Login to the AWS storage system
       ansible.builtin.shell: |
-        /HORCM/usr/bin/raidcom -login "{{ aws_vault_storage_username }}" "{{ aws_vault_storage_secret }}" -I100
+        /HORCM/usr/bin/raidcom -login "{{ aws_cloud_vault_storage_username }}" "{{ aws_cloud_vault_storage_secret }}" -I100
 
     - name: Login to the Azure storage system
       ansible.builtin.shell: |
-        /HORCM/usr/bin/raidcom -login "{{ az_vault_storage_username }}" "{{ az_vault_storage_secret }}" -I101
+        /HORCM/usr/bin/raidcom -login "{{ az_cloud_vault_storage_username }}" "{{ az_cloud_vault_storage_secret }}" -I101
 
     - name: Create cloud HUR PAIR
       ansible.builtin.shell: "/HORCM/usr/bin/paircreate -g DEMO -f async {{ aws_ctg_id }} -jp {{ aws_cloud_journal_number }} -js {{ az_cloud_journal_number }} -vl -I100"
