@@ -157,7 +157,7 @@
       ansible.builtin.debug:
         msg: "{{ horcm101_output.stdout_lines }}"
 
-    - name: Start horcm110
+    - name: Start horcm100
       ansible.builtin.shell: |
         HORCMINST=100 HORCM_CONF=/HORCM/etc/horcm100.conf /HORCM/usr/bin/horcmstart.sh
       register: ret
