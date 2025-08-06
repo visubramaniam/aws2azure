@@ -46,6 +46,7 @@
           --password "{{ az_cloud_vault_storage_secret }}" \
           remotepath_group_list \
           --local_storage_controller_id "{{ az_storage_controller_id }}" |\
+          --remote_serial_number "{{ aws_cloud_storage_serial }}" |\
           grep "^Path" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: path_grp_id_out
       failed_when: path_grp_id_out.rc != 0
@@ -64,11 +65,11 @@
           storage_controller_show \
           --id "{{ az_storage_controller_id }}" |\
           grep "^Active" | tr -d " " | cut -d":" -f2 | tr -d "\n"
-      register: active_node_id_out
-      failed_when: active_node_id_out.rc != 0
+      register: az_active_node_id_out
+      failed_when: az_active_node_id_out.rc != 0
 
     - ansible.builtin.set_fact:
-        az_active_node_id: "{{ active_node_id_out.stdout.strip() }}"
+        az_active_node_id: "{{ az_active_node_id_out.stdout.strip() }}"
 
     - name: Get Azure Active Storage Node ID Control IP
       ansible.builtin.shell: |
@@ -102,21 +103,21 @@
     - ansible.builtin.set_fact:
         aws_active_node_id: "{{ aws_active_node_id_out.stdout.strip() }}"
 
-    - name: Get Azure Active Storage Node ID Control IP
+    - name: Get AWS Active Storage Node ID Control IP
       ansible.builtin.shell: |
         set -o pipefail
         hsds --ignore_certificate_errors \
-          --host "{{ az_cloud_storage_address }}" \
-          --user "{{ az_cloud_vault_storage_username }}" \
-          --password "{{ az_cloud_vault_storage_secret }}" \
+          --host "{{ aws_cloud_storage_address }}" \
+          --user "{{ aws_cloud_vault_storage_username }}" \
+          --password "{{ aws_cloud_vault_storage_secret }}" \
           storage_node_show \
-          --id "{{ az_active_node_id }}" |\
+          --id "{{ aws_active_node_id }}" |\
           grep "^Control" | tr -d " " | cut -d":" -f2 | tr -d "\n"
-      register: active_node_ip_out
-      failed_when: active_node_ip_out.rc != 0
+      register: aws_active_node_ip_out
+      failed_when: aws_active_node_ip_out.rc != 0
 
     - ansible.builtin.set_fact:
-        az_active_node_ip: "{{ active_node_ip_out.stdout.strip() }}"
+        aws_active_node_ip: "{{ aws_active_node_ip_out.stdout.strip() }}"
 
     - name: Check if horcm100 file exists
       ansible.builtin.stat:
