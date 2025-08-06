@@ -45,7 +45,7 @@
           --user "{{ az_cloud_vault_storage_username }}" \
           --password "{{ az_cloud_vault_storage_secret }}" \
           remotepath_group_list \
-          --local_storage_controller_id "{{ az_storage_controller_id }}" |\
+          --local_storage_controller_id "{{ az_storage_controller_id }}" \
           --remote_serial_number "{{ aws_cloud_storage_serial }}" |\
           grep "^Path" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: path_grp_id_out
