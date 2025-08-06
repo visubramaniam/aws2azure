@@ -18,7 +18,7 @@
       hitachivantara.vspone_block.sds_block.hv_sds_block_volume_facts:
         connection_info: "{{ connection_info }}"
         spec:
-          names: ["MySQL-PVOL_00"]
+          names: [ "{{aws_cloud_vol_name }}" ]
       register: result
 
     - name: Debug the result variable
@@ -27,7 +27,7 @@
     - name: Set Storage Controller ID for workflow
       ansible.builtin.set_stats:
         data:
-          storage_controller_id: "{{ result.ansible_facts.volumes[0].storage_controller_id }}"
+          aws_storage_controller_id: "{{ result.ansible_facts.volumes[0].storage_controller_id }}"
     - name: Check if journal volume creation file exists
       ansible.builtin.stat:
         path: /tmp/journal_volume_created
@@ -102,3 +102,27 @@
     - name: Echo command output
       ansible.builtin.debug:
         msg: "{{ command_output.stdout.strip() }}"
+
+    - name: Get Volume Unique ID
+      ansible.builtin.shell: |
+        set -o pipefail
+        hsds --ignore_certificate_errors \
+          --host "{{ aws_cloud_storage_address }}" \
+          --user "{{ aws_cloud_vault_storage_username }}" \
+          --password "{{ aws_cloud_vault_storage_secret }}" \
+          volume_show \
+          --id_name "{{ aws_cloud_vol_name }}" |\
+          grep "^Volume Number" | tr -d " " | cut -d":" -f2 | tr -d "\n"
+      register: volume_uniq_id
+      until: volume_uniq_id.rc == 0
+      retries: 10
+      delay: 30
+
+    - name: Echo volume_uniq_id
+      ansible.builtin.debug:
+        msg: "{{ volume_uniq_id.stdout.strip() }}"
+
+    - name: Set az_volume_uniq_id_out fact in stats
+      ansible.builtin.set_stats:
+        data:
+          pvol_ldev_id: "{{ volume_uniq_id.stdout.strip() }}"

@@ -17,8 +17,8 @@
           storage_controller_show \
           --id "{{ aws_storage_controller_id }}" |\
           grep "^Udp" | tr -d " " | cut -d":" -f2 | tr -d "\n"
-      register: udp_port_out_aws
-      failed_when: udp_port_out_aws.rc != 0
+      register: aws_udp_port_out
+      failed_when: aws_udp_port_out.rc != 0
 
     - name: Get HORCM UDP Port for Cloud Azure Command Device
       ansible.builtin.shell: |
@@ -30,12 +30,12 @@
           storage_controller_show \
           --id "{{ az_storage_controller_id }}" |\
           grep "^Udp" | tr -d " " | cut -d":" -f2 | tr -d "\n"
-      register: udp_port_out_az
-      failed_when: udp_port_out_az.rc != 0
+      register: az_udp_port_out
+      failed_when: az_udp_port_out.rc != 0
 
     - ansible.builtin.set_fact:
-        az_udp_port: "{{ udp_port_out_az.stdout.strip() }}"
-        aws_udp_port: "{{ udp_port_out_aws.stdout.strip() }}"
+        az_udp_port: "{{ aws_udp_port_out.stdout.strip() }}"
+        aws_udp_port: "{{ az_udp_port_out.stdout.strip() }}"
         
     - name: Get Path Group ID for HORCM config file
       ansible.builtin.shell: |
@@ -52,7 +52,7 @@
 
     - name: Set Azure Path Group ID fact
       ansible.builtin.set_fact:
-        az_path_grp_id: "{{ path_grp_id_out.stdout.strip() }}"
+        path_grp_id: "{{ path_grp_id_out.stdout.strip() }}"
 
     - name: Get Active Storage Node ID
       ansible.builtin.shell: |
