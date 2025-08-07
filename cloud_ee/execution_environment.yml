@@ -1,0 +1,38 @@
+---
+version: 3
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+  system: bindep.txt
+  ansible_core:
+     package_pip: ansible-core
+  ansible_runner:
+     package_pip: ansible-runner
+additional_build_files:
+  - src: hsds_cli-1.18.1.50.0038-py3-none-any.whl 
+    dest: configs
+  - src: HORCM.tgz 
+    dest: configs
+  - src: horcm100.conf.j2
+    dest: configs
+  - src: horcm101.conf.j2
+    dest: configs
+additional_build_steps:
+  prepend_base:
+    - COPY _build/configs/hsds_cli-1.18.1.50.0038-py3-none-any.whl /tmp
+    - RUN $PKGMGR -y install python3-pip
+    - RUN $PKGMGR -y install tar
+    - RUN $PKGMGR -y install gzip
+    - RUN $PYCMD -m pip install /tmp/hsds_cli-1.18.1.50.0038-py3-none-any.whl 
+    - COPY _build/configs/HORCM.tgz /tmp
+    - RUN  tar xvzf /tmp/HORCM.tgz -C /
+    - RUN /HORCM/horcminstall.sh
+    - COPY _build/configs/horcm100.conf.j2 /tmp 
+    - COPY _build/configs/horcm101.conf.j2 /tmp 
+    - COPY _build/configs/horcm110.conf.j2 /tmp 
+    - COPY _build/configs/horcm111.conf.j2 /tmp 
+images:
+  base_image:
+    name: quay.io/centos/centos:stream9
+options:
+   package_manager_path: /usr/bin/dnf

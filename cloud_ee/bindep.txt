@@ -1,0 +1,5 @@
+python3
+findutils
+gcc
+make
+tar

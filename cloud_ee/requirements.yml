@@ -1,0 +1,7 @@
+---
+
+collections:
+
+  - name: hitachivantara.vspone_block
+  - name: vmware.vmware
+  - name: community.vmware
