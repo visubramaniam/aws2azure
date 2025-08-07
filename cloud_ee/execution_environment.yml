@@ -29,8 +29,7 @@ additional_build_steps:
     - RUN /HORCM/horcminstall.sh
     - COPY _build/configs/horcm100.conf.j2 /tmp 
     - COPY _build/configs/horcm101.conf.j2 /tmp 
-    - COPY _build/configs/horcm110.conf.j2 /tmp 
-    - COPY _build/configs/horcm111.conf.j2 /tmp 
+
 images:
   base_image:
     name: quay.io/centos/centos:stream9
