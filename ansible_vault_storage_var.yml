@@ -10,7 +10,7 @@ aws_cloud_journal_number: 100
 aws_cloud_journal_name: aws2azure_jnl
 aws_ctg_id: 100
 
-az_cloud_storage_serial: 252879
+az_cloud_storage_serial: 289070
 az_cloud_storage_address: 172.18.1.17
 az_cloud_vault_storage_username: ansible
 az_cloud_vault_storage_secret: Hitachi1!
