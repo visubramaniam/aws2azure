@@ -3,7 +3,7 @@
 aws_cloud_storage_serial: 228743
 aws_cloud_storage_address: 172.17.1.28
 aws_cloud_vault_storage_username: ansible
-aws_cloud_vault_storage_secret: Hitachi123
+aws_cloud_vault_storage_secret: Hitachi1234!
 aws_cloud_vol_name: AWS2Azure
 aws_cloud_pool_name: StoragePool01
 aws_cloud_journal_number: 100
