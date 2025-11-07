@@ -3,7 +3,7 @@
 aws_cloud_storage_serial: 228743
 aws_cloud_storage_address: 172.17.1.28
 aws_cloud_vault_storage_username: ansible
-aws_cloud_vault_storage_secret: Hitachi1234!
+aws_cloud_vault_storage_secret: Hitachi123
 aws_cloud_vol_name: AWS2Azure
 aws_cloud_pool_name: StoragePool01
 aws_cloud_journal_number: 100
@@ -13,7 +13,7 @@ aws_ctg_id: 100
 az_cloud_storage_serial: 280017 
 az_cloud_storage_address: 172.18.1.25
 az_cloud_vault_storage_username: ansible
-az_cloud_vault_storage_secret: Hitachi1234!
+az_cloud_vault_storage_secret: Hitachi123
 az_cloud_vol_name: AWS2Azure
 az_cloud_vol_capacity: 1024
 az_cloud_pool_name: StoragePool01
