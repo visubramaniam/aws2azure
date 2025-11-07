@@ -10,15 +10,15 @@ aws_cloud_journal_number: 100
 aws_cloud_journal_name: aws2azure_jnl
 aws_ctg_id: 100
 
-az_cloud_storage_serial: 289070
-az_cloud_storage_address: 172.18.1.17
+az_cloud_storage_serial: 280017 
+az_cloud_storage_address: 172.18.1.25
 az_cloud_vault_storage_username: ansible
-az_cloud_vault_storage_secret: Hitachi1!
+az_cloud_vault_storage_secret: Hitachi1234!
 az_cloud_vol_name: AWS2Azure
 az_cloud_vol_capacity: 1024
 az_cloud_pool_name: StoragePool01
 az_cloud_compute_node_name: SLES-Jump
 az_cloud_journal_number: 100
 az_cloud_journal_name: aws2azure_jnl
-az_storage_controller_id: 15891969-1087-4dd2-932e-9616478cd820
+az_storage_controller_id: 392fca04-5b3e-4993-97f9-0e1653e75533
 az_ctg_id: 100
