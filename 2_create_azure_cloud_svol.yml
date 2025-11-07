@@ -97,7 +97,7 @@
           --password "{{ az_cloud_vault_storage_secret }}" \
           volume_server_connection_create \
           --volume_id "{{ volume_id }}" \
-          --server_id "e2ab5949-a1c0-4afe-aa26-04804172c86b" |\
+          --server_id "6edc9a83-143a-4c4a-87bc-da21b7f091fb" |\
           grep -i "^Job" | tr -d " " | cut -d":" -f2 | tr -d "\n"
       register: job_id
 
